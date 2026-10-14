@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supporting Hyperplanes | Interactive Optimization Visual Lab</title>
+<style>
+:root{--navy:#122841;--navy2:#183954;--blue:#2565a6;--teal:#0a877d;--coral:#d47346;--muted:#587084;--line:#dce6ed;--paper:#fff;--pale:#f3f7fb}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#eaf2fa,#f9fafc 55%,#ecf8f4);color:var(--navy);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.5}
+header{background:linear-gradient(118deg,#102439,#1a4760 65%,#0b776e);color:white;padding:32px max(22px,calc((100vw - 1180px)/2));box-shadow:0 14px 30px #0d354424}h1{margin:7px 0 8px;font-size:clamp(1.65rem,4vw,2.5rem);letter-spacing:-.04em;line-height:1.13}header p{margin:0;max-width:710px;color:#cbdde8}.eyebrow{letter-spacing:.14em;color:#8edbc9;font-size:.72rem;font-weight:850}.layout{max-width:1180px;margin:24px auto 48px;padding:0 16px}.switches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px}.switches button{border:1px solid #cbd8e3;border-radius:12px;background:white;padding:13px 9px;font:700 .92rem inherit;font-family:inherit;color:var(--navy);cursor:pointer;text-align:center;box-shadow:0 2px 6px #1630470a}.switches button.active{background:var(--navy);color:white;border-color:var(--navy)}.switches button span{opacity:.70;font-size:.78rem;display:block;font-weight:550}.main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(285px,.8fr);gap:18px}.plotcard,.sidecard,.bottomcard{background:var(--paper);border:1px solid var(--line);box-shadow:0 13px 35px #23435b0a;border-radius:18px;overflow:hidden}.panelhead{padding:18px 23px 0}.panelhead h2{font-size:1.24rem;margin:0;letter-spacing:-.024em}.panelhead p{margin:4px 0 8px;color:var(--muted);font-size:.9rem}.canvasbox{padding:0 14px 12px}canvas{display:block;width:100%;height:auto;aspect-ratio:1100/560;touch-action:none;border-radius:12px;background:#fcfdff;cursor:crosshair}.sidecard{padding:22px}.sidecard h3{margin:0 0 6px;font-size:1.16rem}.sidecard p{font-size:.91rem;color:var(--muted)}.hint{padding:11px 13px;border-radius:10px;background:#ebf6f4;border-left:3px solid var(--teal);font-size:.88rem;color:#175d59;margin:14px 0}.control{margin:22px 0}.control label{display:flex;align-items:center;justify-content:space-between;font-size:.91rem;font-weight:750;margin-bottom:8px}.control input[type=range]{width:100%;accent-color:var(--teal)}.statrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#f1f6fa;border:1px solid #deebf4;padding:12px;border-radius:11px}.stat span{display:block;color:var(--muted);font-size:.75rem}.stat b{font-size:1rem;white-space:nowrap}.legend{font-size:.84rem;color:var(--muted);margin-top:16px}.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:middle}.rowcheck{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;background:#f4f8fa;margin-top:7px;font-size:.87rem;font-weight:600}.rowcheck input{accent-color:var(--teal);width:17px;height:17px}.rowcheck span{flex:1}.bigbutton{background:var(--navy);color:white;border:0;border-radius:10px;font-family:inherit;font-weight:700;padding:10px 14px;cursor:pointer}.bigbutton:focus-visible,.switches button:focus-visible,input:focus-visible{outline:3px solid #7fcfba;outline-offset:2px}.bottomcard{margin-top:18px;padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.bottomcard h3{margin:0 0 5px;font-size:1rem}.bottomcard p{margin:0;font-size:.86rem;color:var(--muted)}.formula{font-family:Cambria,"Times New Roman",serif;font-size:1.1rem;font-weight:600;color:var(--navy)}.small{font-size:.78rem!important}footer{padding-top:16px;text-align:center;font-size:.8rem;color:#607686}.hidden{display:none!important}@media(max-width:900px){.main{grid-template-columns:1fr}.sidecard{min-height:0}.bottomcard{grid-template-columns:1fr}}@media(max-width:570px){.switches button{font-size:.77rem;padding:12px 5px}.switches button span{font-size:.68rem}header{padding:23px 19px}.layout{padding:0 9px}.panelhead{padding:15px 14px 0}.sidecard{padding:16px}.canvasbox{padding:0 4px 8px}} 
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">OPTIMIZATION NOTEBOOK · CONCEPT 03 · INTERACTIVE LAB</div>
+  <h1>Convex Sets &amp; Supporting Hyperplanes</h1>
+  <p>Explore the two views of a convex feasible set: points inside it, and linear inequalities forming the walls around it. Works offline; no installations or accounts needed.</p>
+</header>
+<div class="layout">
+  <nav class="switches" aria-label="Choose a visual experiment">
+    <button class="active" type="button" data-mode="ellipse">01 · Supporting line<span>Rotate the wall</span></button>
+    <button type="button" data-mode="polygon">02 · Constraints<span>Build the feasible set</span></button>
+    <button type="button" data-mode="notch">03 · Nonconvex shape<span>Reveal the convex hull</span></button>
+  </nav>
+  <div class="main">
+    <section class="plotcard">
+      <div class="panelhead"><h2 id="panelTitle">One tangent line, infinitely many possible directions</h2><p id="panelSubtitle">Move the slider, or drag on the ellipse, to change the supporting direction.</p></div>
+      <div class="canvasbox"><canvas id="scene" width="1100" height="560" aria-label="Interactive geometric diagram" role="img"></canvas></div>
+    </section>
+    <aside class="sidecard">
+      <div id="controls-ellipse">
+        <h3>Slide the wall around the ellipse</h3>
+        <p>A supporting line touches the ellipse but does not slice through it. Every point of the ellipse remains on the blue, allowed side.</p>
+        <div class="control"><label for="angle">Normal direction <output id="angleLabel">40°</output></label><input id="angle" type="range" min="0" max="359" value="40" step="1" aria-label="Normal angle in degrees"></div>
+        <div class="statrow"><div class="stat"><span>Support height h(u)</span><b id="supportStat">—</b></div><div class="stat"><span>Contact point</span><b id="contactStat">—</b></div></div>
+        <div class="hint">The orange side is forbidden by this wall. A single wall still permits many extra points; intersect every direction's allowed side to reconstruct the ellipse exactly.</div>
+        <button class="bigbutton" id="resetAngle" type="button">Reset to 40°</button>
+      </div>
+      <div id="controls-polygon" class="hidden">
+        <h3>Build the region from constraints</h3>
+        <p>Switch any constraint off to see how the set of allowed points changes. Tap the picture to test a point.</p>
+        <label class="rowcheck"><input type="checkbox" data-constraint="0" checked><span>① x ≥ 0</span></label>
+        <label class="rowcheck"><input type="checkbox" data-constraint="1" checked><span>② y ≥ 0</span></label>
+        <label class="rowcheck"><input type="checkbox" data-constraint="2" checked><span>③ y ≤ 2/3</span></label>
+        <label class="rowcheck"><input type="checkbox" data-constraint="3" checked><span>④ x + y ≤ 1</span></label>
+        <div class="hint" id="polygonReadout">All four constraints selected. The blue polygon is the intersection of the allowed half-planes.</div>
+        <button class="bigbutton" type="button" id="resetConstraints">Restore all four walls</button>
+      </div>
+      <div id="controls-notch" class="hidden">
+        <h3>What if the set is not convex?</h3>
+        <p>The two marked endpoints are inside the orange region, but the straight segment between them travels across the white notch.</p>
+        <label class="rowcheck"><input type="checkbox" id="showHull" checked><span>Show the smallest convex hull</span></label>
+        <div class="hint" id="hullReadout">A half-space intersection cannot recreate this inward bite. It produces a convex set, here represented by the dashed blue rectangle.</div>
+        <button class="bigbutton" id="toggleHull" type="button">Show / hide hull</button>
+      </div>
+      <div class="legend"><span class="dot" style="background:#237fba"></span>Allowed / convex region<br><span class="dot" style="background:#dc855e"></span>Forbidden side or nonconvex shape<br><span class="dot" style="background:#087c78"></span>Selected point / direction</div>
+    </aside>
+  </div>
+  <div class="bottomcard">
+    <section><h3>Why this matters for optimization</h3><p>You can describe a feasible set either by its points or by inequalities <span class="formula">aᵀx ≤ β</span>. For closed convex sets, containing closed half-spaces reconstruct the whole set. At an optimum, <strong>active</strong> constraints are the walls that touch the solution.</p></section>
+    <section><h3>A technical distinction worth remembering</h3><p>A <strong>hyperplane</strong> is the equality boundary <span class="formula">aᵀx = β</span>; a <strong>half-space</strong> is an inequality side. The support function <span class="formula">h<sub>C</sub>(u) = sup<sub>x∈C</sub> uᵀx</span> records a bounding wall in each direction. This is related to duality but not the same thing as a Lagrangian dual problem.</p></section>
+  </div>
+  <footer>Companion to the single-file Overleaf notebook · Steven Brunton optimization playlist study notes · Original offline interactive graphics</footer>
+</div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
+const W=1100,H=560;let mode='ellipse';let theta=40;let constraints=[true,true,true,true];let testPoint={x:.20,y:.30};let showHull=true;
+const ink='#19314a',muted='#8396a6',teal='#078579',blue='#2169a4',coral='#d47346';
+let viewport={xmin:-3.1,xmax:3.1,ymin:-2.05,ymax:2.05};
+function view(v){viewport=v}
+function X(x){return 75+(x-viewport.xmin)/(viewport.xmax-viewport.xmin)*(W-150)}
+function Y(y){return H-55-(y-viewport.ymin)/(viewport.ymax-viewport.ymin)*(H-108)}
+function sx(x){return viewport.xmin+(x-75)/(W-150)*(viewport.xmax-viewport.xmin)}
+function sy(y){return viewport.ymin+(H-55-y)/(H-108)*(viewport.ymax-viewport.ymin)}
+function P(p){return [X(p.x),Y(p.y)]}
+function start(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#fcfdff';ctx.fillRect(0,0,W,H)}
+function path(points){if(!points.length)return;ctx.beginPath();let q=P(points[0]);ctx.moveTo(q[0],q[1]);for(let i=1;i<points.length;i++){q=P(points[i]);ctx.lineTo(q[0],q[1])}ctx.closePath()}
+function poly(points,fill,stroke,width=2){if(!points.length)return;path(points);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke()}}
+function line(a,b,color=ink,width=2,dashed=false){ctx.beginPath();ctx.setLineDash(dashed?[11,7]:[]);ctx.moveTo(...P(a));ctx.lineTo(...P(b));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.setLineDash([])}
+function circ(p,r,color,outline){ctx.beginPath();ctx.arc(...P(p),r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();if(outline){ctx.lineWidth=2;ctx.strokeStyle=outline;ctx.stroke()}}
+function text(s,p,color=ink,size=23,weight='600',align='left'){ctx.fillStyle=color;ctx.font=`${weight} ${size}px system-ui, sans-serif`;ctx.textAlign=align;ctx.fillText(s,...P(p));ctx.textAlign='left'}
+function arrow(a,b,color=coral){line(a,b,color,5);const p=P(b),q=P(a),v=Math.atan2(p[1]-q[1],p[0]-q[0]);ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(p[0]-19*Math.cos(v-.38),p[1]-19*Math.sin(v-.38));ctx.lineTo(p[0]-19*Math.cos(v+.38),p[1]-19*Math.sin(v+.38));ctx.closePath();ctx.fillStyle=color;ctx.fill()}
+function rectWorld(){return [{x:viewport.xmin,y:viewport.ymin},{x:viewport.xmax,y:viewport.ymin},{x:viewport.xmax,y:viewport.ymax},{x:viewport.xmin,y:viewport.ymax}]}
+function clip(pts,a,b,c,less=true){let out=[];if(!pts.length)return out;for(let i=0;i<pts.length;i++){const s=pts[i],e=pts[(i+1)%pts.length],ds=a*s.x+b*s.y-c,de=a*e.x+b*e.y-c,is=less?ds<=1e-9:ds>=-1e-9,ie=less?de<=1e-9:de>=-1e-9;if(is&&ie){out.push(e)}else if(is!==ie){let t=ds/(ds-de),p={x:s.x+(e.x-s.x)*t,y:s.y+(e.y-s.y)*t};if(is)out.push(p);else out.push(p,e)}}return out}
+function grid(dx=.5,dy=.5){ctx.save();ctx.lineWidth=1;ctx.strokeStyle='#e8eef4';for(let x=Math.ceil(viewport.xmin/dx)*dx;x<viewport.xmax;x+=dx)line({x,y:viewport.ymin},{x,y:viewport.ymax},'#e9eff5',1);for(let y=Math.ceil(viewport.ymin/dy)*dy;y<viewport.ymax;y+=dy)line({x:viewport.xmin,y},{x:viewport.xmax,y},'#e9eff5',1);if(viewport.xmin<0&&viewport.xmax>0)line({x:0,y:viewport.ymin},{x:0,y:viewport.ymax},'#9dafbb',2);if(viewport.ymin<0&&viewport.ymax>0)line({x:viewport.xmin,y:0},{x:viewport.xmax,y:0},'#9dafbb',2);ctx.restore()}
+function ellipse(){view({xmin:-3.15,xmax:3.15,ymin:-2.1,ymax:2.1});start();grid(1,1);const a=1.70,b=1.04,phi=theta*Math.PI/180,nx=Math.cos(phi),ny=Math.sin(phi),h=Math.hypot(a*nx,b*ny),contact={x:a*a*nx/h,y:b*b*ny/h};const forbid=clip(rectWorld(),nx,ny,h,false);poly(forbid,'rgba(220,120,67,.125)');const pts=[];for(let i=0;i<160;i++){let t=i/160*Math.PI*2;pts.push({x:a*Math.cos(t),y:b*Math.sin(t)})}poly(pts,'rgba(14,146,128,.18)',teal,4);
+const tangent={x:-ny,y:nx};line({x:contact.x-4*tangent.x,y:contact.y-4*tangent.y},{x:contact.x+4*tangent.x,y:contact.y+4*tangent.y},coral,4);
+arrow(contact,{x:contact.x+.77*nx,y:contact.y+.77*ny},coral);circ(contact,10,'#fff',coral);circ(contact,5,coral);
+text('CONVEX SET C',{x:-1.24,y:-.12},teal,23,'800');text('allowed side',{x:-2.76,y:-1.67},blue,22,'700');text('forbidden side',{x:1.48,y:1.78},coral,22,'700');
+text('u = (cos θ, sin θ)',{x:-2.79,y:1.82},ink,22,'550');text('uᵀx = h(u)',{x:contact.x-.9*tangent.x,y:contact.y-.9*tangent.y},coral,22,'700');
+text('H touches C at a single point',{x:-2.72,y:-1.92},muted,17,'550');
+document.getElementById('supportStat').textContent=h.toFixed(3);document.getElementById('contactStat').textContent=`(${contact.x.toFixed(2)}, ${contact.y.toFixed(2)})`;}
+function polygon(){view({xmin:-.34,xmax:1.44,ymin:-.26,ymax:1.12});start();grid(.2,.2);const specs=[[-1,0,0],[0,-1,0],[0,1,2/3],[1,1,1]];let pts=rectWorld();specs.forEach(([a,b,c],i)=>{if(constraints[i])pts=clip(pts,a,b,c)});poly(pts,'rgba(38,126,187,.20)',blue,3);
+const lines=[[[0,-.26],[0,1.12]],[[-.34,0],[1.44,0]],[[-.34,2/3],[1.44,2/3]],[[-.13,1.12],[1.39,-.40]]];for(let i=0;i<4;i++){const [p,q]=lines[i];line({x:p[0],y:p[1]},{x:q[0],y:q[1]},constraints[i]?coral:'#c5d2dd',constraints[i]?4:2,!constraints[i])}
+text('x = 0',{x:-.31,y:.82},ink,21);text('y = 0',{x:.83,y:-.14},ink,21);text('y = 2/3',{x:.78,y:.76},ink,21);text('x + y = 1',{x:.91,y:.41},ink,21);text('C',{x:.18,y:.22},blue,37,'800');
+const v=testPoint;let good=specs.every(([a,b,c],i)=>!constraints[i]||a*v.x+b*v.y<=c+1e-7);circ(v,10,good?teal:coral,'#fff');text(good?'feasible':'infeasible',{x:Math.min(v.x+.06,1.13),y:Math.min(v.y+.09,.95)},good?teal:coral,20,'700');if(constraints.filter(Boolean).length<4)text('Shown region is clipped to the graph window',{x:-.24,y:1.065},muted,17,'500');
+const m=constraints.filter(Boolean).length, status=good?'satisfies':'violates';document.getElementById('polygonReadout').textContent=`${m} of 4 constraints are active in the visualization. Test point (${v.x.toFixed(2)}, ${v.y.toFixed(2)}) ${status} all selected inequalities. Click anywhere in the diagram to move the point.`;}
+function notch(){view({xmin:-2.2,xmax:2.2,ymin:-1.62,ymax:1.62});start();grid(.5,.5);const notch=[{x:-1.45,y:-1.0},{x:1.45,y:-1},{x:1.45,y:1.0},{x:.72,y:1},{x:0,y:-.23},{x:-.72,y:1},{x:-1.45,y:1}];const hull=[{x:-1.45,y:-1},{x:1.45,y:-1},{x:1.45,y:1},{x:-1.45,y:1}];if(showHull)poly(hull,'rgba(40,126,186,.14)',blue,0);poly(notch,'rgba(220,120,67,.24)',coral,4);if(showHull){path(hull);ctx.setLineDash([13,9]);ctx.lineWidth=5;ctx.strokeStyle=blue;ctx.stroke();ctx.setLineDash([])}
+const p={x:-.88,y:.85},q={x:.88,y:.85};line(p,q,ink,5);circ(p,9,ink);circ(q,9,ink);text('p',{x:-1.02,y:1.13},ink,25);text('q',{x:.88,y:1.13},ink,25);text('NOTCH: missing points',{x:-.85,y:.32},coral,22,'700');if(showHull){text('dashed = convex hull',{x:-1.76,y:-1.38},blue,23,'750');text('filled notch',{x:.75,y:-.75},coral,20,'650')}else{text('Nonconvex shape',{x:-1.70,y:-1.40},coral,23,'700')}
+}
+function render(){if(mode==='ellipse')ellipse();else if(mode==='polygon')polygon();else notch()}
+function setMode(m){mode=m;document.querySelectorAll('.switches button').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));for(const k of ['ellipse','polygon','notch'])document.getElementById('controls-'+k).classList.toggle('hidden',k!==m);const titles={ellipse:['One tangent line, infinitely many possible directions','Move the slider, or drag on the ellipse, to change the supporting direction.'],polygon:['Four half-planes make one feasible set','Remove and restore the constraints. Every intersection stays convex.'],notch:['Why intersections of half-planes cannot draw an inward notch','See how the convex hull fills in the missing area.']};document.getElementById('panelTitle').textContent=titles[m][0];document.getElementById('panelSubtitle').textContent=titles[m][1];render()}
+document.querySelectorAll('.switches button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+const angle=document.getElementById('angle');function setAngle(v){theta=(Math.round(v)+360)%360;angle.value=theta;document.getElementById('angleLabel').textContent=theta+'°';render()}
+angle.addEventListener('input',e=>setAngle(+e.target.value));document.getElementById('resetAngle').addEventListener('click',()=>setAngle(40));
+document.querySelectorAll('[data-constraint]').forEach(cb=>cb.addEventListener('change',()=>{constraints[+cb.dataset.constraint]=cb.checked;render()}));
+document.getElementById('resetConstraints').addEventListener('click',()=>{constraints=[true,true,true,true];document.querySelectorAll('[data-constraint]').forEach(cb=>cb.checked=true);testPoint={x:.2,y:.3};render()});
+const hullCb=document.getElementById('showHull');hullCb.addEventListener('change',()=>{showHull=hullCb.checked;render()});document.getElementById('toggleHull').addEventListener('click',()=>{hullCb.checked=!hullCb.checked;showHull=hullCb.checked;render()});
+function pos(e){const b=canvas.getBoundingClientRect();return {x:sx((e.clientX-b.left)/b.width*W),y:sy((e.clientY-b.top)/b.height*H)}}
+function onPointer(e){const p=pos(e);if(mode==='ellipse'){setAngle(Math.atan2(p.y/(1.04*1.04),p.x/(1.70*1.70))*180/Math.PI)}else if(mode==='polygon'){testPoint=p;render()}}
+let dragging=false;canvas.addEventListener('pointerdown',e=>{dragging=true;canvas.setPointerCapture(e.pointerId);onPointer(e)});canvas.addEventListener('pointermove',e=>{if(dragging&&mode==='ellipse')onPointer(e)});canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
+render();
+})();
+</script>
+</body>
+</html>
